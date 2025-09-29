@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import {
   Box, Button, Stepper, Step, StepLabel, Typography, Container, Paper, Grid, TextField,
   FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel, Checkbox, RadioGroup, Radio,
-  List, ListItem, ListItemText, Divider, LinearProgress
+  List, ListItem, ListItemText, Divider, ToggleButtonGroup, ToggleButton
 } from '@mui/material';
 
 const TOTAL_STEPS = 4;
@@ -158,7 +158,7 @@ function SectionBasic({ basic, setBasic }) {
   const handleChange = (e) => setBasic({ ...basic, [e.target.name]: e.target.value });
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+    <Box maxWidth={"480px"} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
       <Typography variant="h5" gutterBottom sx={{ mb: 1 }}>1) Basic Info</Typography>
       <TextField fullWidth label="Name" name="name" value={basic.name} onChange={handleChange} variant="outlined" />
       <MuiSelect label="Age Band" name="ageBand" value={basic.ageBand} onChange={handleChange} options={["<18", "18–22", "23–27", "28–34", "35–44", "45+"]} />
@@ -172,7 +172,7 @@ function SectionBasic({ basic, setBasic }) {
 
 function SectionPersonality({ answers, setAnswers }) {
   return (
-    <Box>
+    <Box maxWidth={"480px"}>
       <Typography variant="h5" gutterBottom sx={{ mb: 1 }}>2) Personality</Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2 }}>1 = Strongly Disagree · 5 = Strongly Agree</Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -190,16 +190,8 @@ function SectionPersonality({ answers, setAnswers }) {
 }
 
 function SectionSkillsPrefs({ skillsText, setSkillsText, prefs, setPrefs }) {
-  const handleCheckboxChange = (group, option) => {
-    const currentValues = prefs[group] || [];
-    const newValues = currentValues.includes(option)
-      ? currentValues.filter(item => item !== option)
-      : [...currentValues, option];
-    setPrefs({ ...prefs, [group]: newValues });
-  };
-
   return (
-    <Box>
+    <Box maxWidth={"480px"}>
       <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>3) Skills & Preferences</Typography>
       <TextField
         fullWidth
@@ -212,19 +204,29 @@ function SectionSkillsPrefs({ skillsText, setSkillsText, prefs, setPrefs }) {
         variant="outlined"
       />
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 3 }}>
-        <FormControl component="fieldset" fullWidth>
+        <Box>
           <Typography component="legend" variant="body1" sx={{ mb: 1 }}>Target Roles (multi-select)</Typography>
-          <FormGroup>
-            {roleOptions.map(opt => <FormControlLabel key={opt} control={<Checkbox checked={prefs.roles.includes(opt)} onChange={() => handleCheckboxChange('roles', opt)} />} label={opt} />)}
-          </FormGroup>
-        </FormControl>
+          <ToggleButtonGroup
+            value={prefs.roles}
+            onChange={(event, newRoles) => setPrefs({ ...prefs, roles: newRoles })}
+            aria-label="target roles"
+            sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}
+          >
+            {roleOptions.map(opt => <ToggleButton key={opt} value={opt} sx={{ textTransform: 'none', borderRadius: '16px !important' }}>{opt}</ToggleButton>)}
+          </ToggleButtonGroup>
+        </Box>
 
-        <FormControl component="fieldset" fullWidth>
+        <Box>
           <Typography component="legend" variant="body1" sx={{ mb: 1 }}>Target Industries (multi-select)</Typography>
-          <FormGroup>
-            {industryOptions.map(opt => <FormControlLabel key={opt} control={<Checkbox checked={prefs.industries.includes(opt)} onChange={() => handleCheckboxChange('industries', opt)} />} label={opt} />)}
-          </FormGroup>
-        </FormControl>
+          <ToggleButtonGroup
+            value={prefs.industries}
+            onChange={(event, newIndustries) => setPrefs({ ...prefs, industries: newIndustries })}
+            aria-label="target industries"
+            sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}
+          >
+            {industryOptions.map(opt => <ToggleButton key={opt} value={opt} sx={{ textTransform: 'none', borderRadius: '16px !important' }}>{opt}</ToggleButton>)}
+          </ToggleButtonGroup>
+        </Box>
 
         <MuiSelect label="Work Mode" name="workMode" value={prefs.workMode} onChange={(e) => setPrefs({ ...prefs, workMode: e.target.value })} options={["Remote", "Hybrid", "On-site"]} />
       </Box>
@@ -244,7 +246,7 @@ function SectionSummary({ basic, personality, skillsText, prefs }) {
   }, [personality]);
 
   return (
-    <Box>
+    <Box maxWidth={"480px"}>
       <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>4) Summary</Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ p: 2, border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 1, textAlign: 'left' }}>
