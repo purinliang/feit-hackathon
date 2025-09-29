@@ -441,7 +441,7 @@ function Graph({
         linkColor={getLinkColor}
         onNodeHover={handleNodeHover}
         onLinkHover={handleLinkHover}
-        linkDirectionalArrowLength={4}
+        linkDirectionalArrowLength={3.5}
         linkDirectionalArrowRelPos={1}
         linkDirectionalParticles={getParticlesCount}
         /** 
