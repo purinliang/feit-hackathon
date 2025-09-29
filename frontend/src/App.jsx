@@ -28,7 +28,23 @@ function MainApp() {
   const [recommendedJobId, setRecommendedJobId] = useState(null);
 
   // 预处理节点数据，方便在 ResultPage 中查找节点名称
-  const nodeMap = useMemo(() => new Map(initialGraphData.nodes.map(node => [node.id, node])), []);
+  const { nodeMap, predecessorsMap } = useMemo(() => {
+    const map = new Map(initialGraphData.nodes.map(node => [node.id, node]));
+    const jobPredecessorsMap = new Map();
+
+    initialGraphData.nodes.forEach((node) => {
+      if (node.type === 'job') {
+        jobPredecessorsMap.set(node.id, []);
+      }
+    });
+
+    (initialGraphData.edges ?? []).forEach(edge => {
+      if (jobPredecessorsMap.has(edge.target)) {
+        jobPredecessorsMap.get(edge.target).push(edge.source);
+      }
+    });
+    return { nodeMap: map, predecessorsMap: jobPredecessorsMap };
+  }, []);
 
   // 根据当前路由更新 activeStep
   useEffect(() => {
@@ -95,7 +111,7 @@ function MainApp() {
         <Box
           sx={{
             width: 800,
-            height: 480,
+            height: 600,
             bgcolor: 'grey.900', // 给内容区一个稍亮的背景以区分
             borderRadius: 2,
             boxShadow: 6,
@@ -112,7 +128,7 @@ function MainApp() {
               element={
                 <GraphPage
                   width={800}
-                  height={480}
+                  height={600}
                   learnedSkillIds={learnedSkillIds}
                   setLearnedSkillIds={setLearnedSkillIds}
                   recommendedJobId={recommendedJobId}
@@ -120,7 +136,7 @@ function MainApp() {
                 />
               }
             />
-            <Route path="/results" element={<ResultPage learnedSkillIds={learnedSkillIds} recommendedJobId={recommendedJobId} nodeMap={nodeMap} />} />
+            <Route path="/results" element={<ResultPage learnedSkillIds={learnedSkillIds} recommendedJobId={recommendedJobId} nodeMap={nodeMap} predecessorsMap={predecessorsMap} />} />
           </Routes>
         </Box>
       </Box>
