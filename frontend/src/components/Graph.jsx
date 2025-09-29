@@ -3,7 +3,7 @@ import initialGraphData from "../data/GraphData";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { forceCollide } from "https://esm.sh/d3-force-3d";
 
-function Graph(props) {
+function Graph({ width, height }) {
   const fgRef = useRef();
 
   // 1. 状态更新：替换为 Learned Skills 和 Recommended Job
@@ -153,7 +153,10 @@ function Graph(props) {
   }, []);
 
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
+    <div style={{
+      width: width ? `${width}px` : "100%", // 使用传入的 width prop，否则默认为 100%
+      height: height ? `${height}px` : "100%", // 使用传入的 height prop，否则默认为 100%
+    }}>
       <ForceGraph2D
         ref={fgRef}
         graphData={forceGraphData}
