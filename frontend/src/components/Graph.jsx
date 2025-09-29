@@ -384,6 +384,7 @@ function Graph({
         height: height ? `${height}px` : "100%",
         borderRadius: "0.75rem", // 圆角
         overflow: "hidden",
+        backgroundColor: COLORS.background
       }}
       className="shadow-2xl"
     >
@@ -405,7 +406,7 @@ function Graph({
         nodeCanvasObjectMode={(node) => "after"}
         nodeCanvasObject={paintNode}
         nodeRelSize={GRAPH_STYLE.nodeRelSize}
-        dagMode="zin"
+        
         onNodeClick={handleClick}
         linkWidth={getLinkWidth}
         linkLineDash={getLinkDash}
@@ -415,6 +416,8 @@ function Graph({
         linkDirectionalArrowLength={6}
         linkDirectionalArrowRelPos={1}
         linkDirectionalParticles={getParticlesCount}
+        /** 
+        dagMode="zin"
         d3Force={(forceName, force) => {
           if (forceName === "charge") {
             force.strength(-3000); // stronger repulsion
@@ -424,11 +427,21 @@ function Graph({
           }
         }}
         // Link strength based on x value
-        linkStrength={(link) => {
-          // normalize or cap values if needed
-          return Math.min(1, Math.max(0.3, link.necessity));
+        //linkStrength={(link) => {return Math.min(1, Math.max(0.3, link.necessity));}}
+        //linkDistance={100} // default link length
+        */
+        
+        linkStrength={(l) => Math.max(0.2, l.necessity * 0.8)}
+        
+        linkDistance={(l) => 120 + (1 - l.necessity) * 140}
+          d3Force={(name, force) => {
+          if (name === "charge") {
+            force.strength(-1800).distanceMax(350);
+          }
+          if (name === "collide") {
+            return forceCollide(18);
+          }
         }}
-        linkDistance={100} // default link length
       />
     </div>
   );
