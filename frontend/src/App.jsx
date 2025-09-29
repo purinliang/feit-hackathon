@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  ReactFlow, // 修正：现在 ReactFlow 在大括号内
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState
+} from '@xyflow/react';
 
-function App() {
-  const [count, setCount] = useState(0)
+import CustomNode from './components/CustomNode';
+import { getInitialElements } from './utils/dataTransformer';
+
+// 注册自定义节点类型
+const nodeTypes = {
+  skillNode: CustomNode,
+  jobNode: CustomNode,
+};
+
+
+
+const initialElements = getInitialElements();
+
+function CareerGraph() {
+  // 使用 React Flow 的 hooks 管理节点和边状态
+  const [nodes, setNodes] = useNodesState(initialElements.nodes);
+  const [edges, setEdges] = useEdgesState(initialElements.edges);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes} // 传入自定义节点类型
+        fitView // 确保图表在初始时完全可见
+      >
+        <Controls />
+        <Background variant="dots" gap={12} size={1} />
+      </ReactFlow>
+    </div>
+  );
 }
 
-export default App
+export default CareerGraph;
