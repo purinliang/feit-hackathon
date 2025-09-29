@@ -1,10 +1,17 @@
 import ForceGraph2D from "react-force-graph-2d";
 import initialGraphData from "../data/GraphData";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { forceCollide } from "https://esm.sh/d3-force-3d";
 
 function Graph(props) {
   const fgRef = useRef();
+
+  const handleClick = useCallback(node => {
+    console.log(`Node ID: ${node.id}`);
+    console.log(`Node Name: ${node.name}`);
+    console.log(`Node Type: ${nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]].type}`);
+  }, []);
+
   useEffect(() => {
     // add collision force
     fgRef.current.d3Force(
@@ -70,6 +77,7 @@ function Graph(props) {
         dagMode="zin"
         backgroundColor="#d0f5bbff"
         linkColor={() => "rgba(63, 41, 41, 0.2)"}
+        onNodeClick={handleClick}
       />
     </div>
   );
