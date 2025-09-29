@@ -398,7 +398,8 @@ function Graph({
         // =========================================================
         // 调整背景色和文字颜色
         // =========================================================
-        backgroundColor="#1f2937" // 深灰色背景 (Tailwind gray-800)
+        //backgroundColor="#1f2937" // 深灰色背景 (Tailwind gray-800)
+        backgroundColor={COLORS.background} 
         // =========================================================
         //nodeCanvasObjectMode={(node) => "before"}
         nodeCanvasObjectMode={(node) => "after"}
