@@ -61,7 +61,7 @@ function MainApp() {
   const isLastStep = activeStep === steps.length - 1;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
       {/* 顶部进度条和Next Page按钮 */}
       <Box
         sx={{
