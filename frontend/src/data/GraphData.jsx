@@ -1,54 +1,583 @@
-// ==========================================================
-// 1. 结构说明 (在 JavaScript 中，这些是对象和数组的预期结构)
-// ==========================================================
-
-/*
-// Node (节点) 对象的预期结构：
-// {
-//     id: 'string',
-//     name: 'string',
-//     type: 'skill' | 'job',
-//     time: 100, // number (小时)
-//     value: 85 // number (0 ~ 100)
-// }
-
-// Edge (边) 对象的预期结构：
-// {
-//     id: 'string',
-//     source: 'string', // 起点 Node 的 id
-//     target: 'string', // 终点 Node 的 id
-//     necessity: 0.95 // number (0.00 ~ 1.00)
-// }
-*/
-
-// ==========================================================
-// 2. 示例数据 (initialGraphData)
-// ==========================================================
-
 const initialGraphData = {
-  // 节点数据 (Nodes)
+  // ===== Nodes =====
   nodes: [
-    { id: "js", name: "JavaScript", type: "skill", time: 100, value: 0.85 },
-    { id: "react", name: "React", type: "skill", time: 150, value: 0.9 },
-    { id: "fe_dev", name: "前端开发", type: "job", time: 0, value: 0.95 },
-    { id: "html", name: "HTML/CSS", type: "skill", time: 50, value: 0.7 },
+    // Jobs (6)
+    {
+      id: "job_frontend_dev",
+      name: "Frontend Developer",
+      type: "job",
+      time: 0,
+      value: 0.92,
+    },
+    {
+      id: "job_backend_dev",
+      name: "Backend Developer",
+      type: "job",
+      time: 0,
+      value: 0.93,
+    },
+    {
+      id: "job_data_analyst",
+      name: "Data Analyst",
+      type: "job",
+      time: 0,
+      value: 0.9,
+    },
+    {
+      id: "job_ml_engineer",
+      name: "ML Engineer",
+      type: "job",
+      time: 0,
+      value: 0.94,
+    },
+    {
+      id: "job_devops",
+      name: "DevOps Engineer",
+      type: "job",
+      time: 0,
+      value: 0.93,
+    },
+    {
+      id: "job_prod_manager",
+      name: "Product Manager (Tech)",
+      type: "job",
+      time: 0,
+      value: 0.91,
+    },
+
+    // Skills (30)
+    { id: "html_css", name: "HTML/CSS", type: "skill", time: 50, value: 0.6 },
+    {
+      id: "javascript",
+      name: "JavaScript",
+      type: "skill",
+      time: 100,
+      value: 0.85,
+    },
+    {
+      id: "typescript",
+      name: "TypeScript",
+      type: "skill",
+      time: 80,
+      value: 0.8,
+    },
+    { id: "react", name: "React", type: "skill", time: 120, value: 0.88 },
+    { id: "nodejs", name: "Node.js", type: "skill", time: 120, value: 0.86 },
+    { id: "express", name: "Express", type: "skill", time: 60, value: 0.75 },
+    { id: "python", name: "Python", type: "skill", time: 120, value: 0.9 },
+    { id: "fastapi", name: "FastAPI", type: "skill", time: 60, value: 0.7 },
+    { id: "pandas", name: "Pandas", type: "skill", time: 80, value: 0.85 },
+    { id: "numpy", name: "NumPy", type: "skill", time: 60, value: 0.8 },
+    {
+      id: "data_viz",
+      name: "Data Visualization",
+      type: "skill",
+      time: 80,
+      value: 0.82,
+    },
+    { id: "sql", name: "SQL", type: "skill", time: 100, value: 0.9 },
+    {
+      id: "statistics",
+      name: "Statistics",
+      type: "skill",
+      time: 100,
+      value: 0.83,
+    },
+    {
+      id: "ml_basics",
+      name: "ML Basics",
+      type: "skill",
+      time: 100,
+      value: 0.84,
+    },
+    {
+      id: "scikit_learn",
+      name: "Scikit-learn",
+      type: "skill",
+      time: 80,
+      value: 0.82,
+    },
+    {
+      id: "tensorflow",
+      name: "TensorFlow",
+      type: "skill",
+      time: 120,
+      value: 0.78,
+    },
+    { id: "pytorch", name: "PyTorch", type: "skill", time: 120, value: 0.78 },
+    { id: "git", name: "Git", type: "skill", time: 30, value: 0.7 },
+    {
+      id: "linux_cli",
+      name: "Linux CLI",
+      type: "skill",
+      time: 40,
+      value: 0.75,
+    },
+    {
+      id: "http_rest",
+      name: "HTTP/REST",
+      type: "skill",
+      time: 40,
+      value: 0.72,
+    },
+    {
+      id: "api_design",
+      name: "API Design",
+      type: "skill",
+      time: 60,
+      value: 0.8,
+    },
+    {
+      id: "system_design",
+      name: "System Design",
+      type: "skill",
+      time: 120,
+      value: 0.88,
+    },
+    { id: "docker", name: "Docker", type: "skill", time: 80, value: 0.86 },
+    {
+      id: "kubernetes",
+      name: "Kubernetes",
+      type: "skill",
+      time: 120,
+      value: 0.85,
+    },
+    {
+      id: "aws_cloud",
+      name: "AWS Cloud",
+      type: "skill",
+      time: 120,
+      value: 0.9,
+    },
+    { id: "ci_cd", name: "CI/CD", type: "skill", time: 80, value: 0.82 },
+    {
+      id: "monitoring",
+      name: "Monitoring & Logging",
+      type: "skill",
+      time: 60,
+      value: 0.78,
+    },
+    {
+      id: "agile_scrum",
+      name: "Agile/Scrum",
+      type: "skill",
+      time: 30,
+      value: 0.76,
+    },
+    {
+      id: "product_sense",
+      name: "Product Sense",
+      type: "skill",
+      time: 60,
+      value: 0.8,
+    },
+    {
+      id: "ab_testing",
+      name: "A/B Testing",
+      type: "skill",
+      time: 40,
+      value: 0.77,
+    },
   ],
 
-  // 边数据 (Edges)
+  // ===== Edges (only meaningful relations; no necessity=0) =====
   edges: [
-    // 依赖关系：HTML/CSS -> JavaScript (依赖度 80%)
-    { id: "e-html-js", source: "html", target: "js", necessity: 0.8 },
+    // Skill -> Skill (prereqs / progression)
+    {
+      id: "e_html_js",
+      source: "html_css",
+      target: "javascript",
+      necessity: 0.6,
+    },
+    {
+      id: "e_js_ts",
+      source: "javascript",
+      target: "typescript",
+      necessity: 0.7,
+    },
+    { id: "e_js_react", source: "javascript", target: "react", necessity: 0.9 },
+    { id: "e_ts_react", source: "typescript", target: "react", necessity: 0.8 },
+    { id: "e_js_node", source: "javascript", target: "nodejs", necessity: 0.8 },
+    {
+      id: "e_node_express",
+      source: "nodejs",
+      target: "express",
+      necessity: 0.9,
+    },
 
-    // 依赖关系：JavaScript -> React (依赖度 95%)
-    { id: "e-js-react", source: "js", target: "react", necessity: 0.95 },
+    { id: "e_py_pandas", source: "python", target: "pandas", necessity: 0.85 },
+    { id: "e_py_numpy", source: "python", target: "numpy", necessity: 0.8 },
+    { id: "e_py_fastapi", source: "python", target: "fastapi", necessity: 0.8 },
+    {
+      id: "e_pandas_viz",
+      source: "pandas",
+      target: "data_viz",
+      necessity: 0.7,
+    },
+    { id: "e_sql_viz", source: "sql", target: "data_viz", necessity: 0.6 },
 
-    // 依赖关系：React -> 前端开发 (依赖度 85%)
-    { id: "e-react-fe", source: "react", target: "fe_dev", necessity: 0.85 },
+    {
+      id: "e_stats_ml",
+      source: "statistics",
+      target: "ml_basics",
+      necessity: 0.85,
+    },
+    { id: "e_py_ml", source: "python", target: "ml_basics", necessity: 0.8 },
+    {
+      id: "e_ml_skl",
+      source: "ml_basics",
+      target: "scikit_learn",
+      necessity: 0.9,
+    },
+    { id: "e_np_skl", source: "numpy", target: "scikit_learn", necessity: 0.7 },
+    {
+      id: "e_skl_tf",
+      source: "scikit_learn",
+      target: "tensorflow",
+      necessity: 0.6,
+    },
+    {
+      id: "e_skl_torch",
+      source: "scikit_learn",
+      target: "pytorch",
+      necessity: 0.6,
+    },
 
-    // 依赖关系：JavaScript -> 前端开发 (依赖度 40%)
-    { id: "e-js-fe", source: "js", target: "fe_dev", necessity: 0.4 },
+    {
+      id: "e_linux_docker",
+      source: "linux_cli",
+      target: "docker",
+      necessity: 0.7,
+    },
+    {
+      id: "e_docker_k8s",
+      source: "docker",
+      target: "kubernetes",
+      necessity: 0.7,
+    },
+    {
+      id: "e_aws_k8s",
+      source: "aws_cloud",
+      target: "kubernetes",
+      necessity: 0.5,
+    },
+    { id: "e_git_cicd", source: "git", target: "ci_cd", necessity: 0.7 },
+    {
+      id: "e_http_api",
+      source: "http_rest",
+      target: "api_design",
+      necessity: 0.8,
+    },
+    {
+      id: "e_api_sys",
+      source: "api_design",
+      target: "system_design",
+      necessity: 0.7,
+    },
+    { id: "e_sql_ab", source: "sql", target: "ab_testing", necessity: 0.7 },
+    {
+      id: "e_stats_ab",
+      source: "statistics",
+      target: "ab_testing",
+      necessity: 0.8,
+    },
+
+    // Skill -> Job (necessity)
+    // Frontend Developer
+    {
+      id: "e_html_fe",
+      source: "html_css",
+      target: "job_frontend_dev",
+      necessity: 0.7,
+    },
+    {
+      id: "e_js_fe",
+      source: "javascript",
+      target: "job_frontend_dev",
+      necessity: 0.9,
+    },
+    {
+      id: "e_ts_fe",
+      source: "typescript",
+      target: "job_frontend_dev",
+      necessity: 0.8,
+    },
+    {
+      id: "e_react_fe",
+      source: "react",
+      target: "job_frontend_dev",
+      necessity: 0.9,
+    },
+    {
+      id: "e_http_fe",
+      source: "http_rest",
+      target: "job_frontend_dev",
+      necessity: 0.6,
+    },
+    {
+      id: "e_git_fe",
+      source: "git",
+      target: "job_frontend_dev",
+      necessity: 0.6,
+    },
+    {
+      id: "e_api_fe",
+      source: "api_design",
+      target: "job_frontend_dev",
+      necessity: 0.5,
+    },
+
+    // Backend Developer
+    {
+      id: "e_node_be",
+      source: "nodejs",
+      target: "job_backend_dev",
+      necessity: 0.9,
+    },
+    {
+      id: "e_expr_be",
+      source: "express",
+      target: "job_backend_dev",
+      necessity: 0.85,
+    },
+    {
+      id: "e_py_be",
+      source: "python",
+      target: "job_backend_dev",
+      necessity: 0.6,
+    },
+    {
+      id: "e_sql_be",
+      source: "sql",
+      target: "job_backend_dev",
+      necessity: 0.8,
+    },
+    {
+      id: "e_api_be",
+      source: "api_design",
+      target: "job_backend_dev",
+      necessity: 0.8,
+    },
+    {
+      id: "e_sys_be",
+      source: "system_design",
+      target: "job_backend_dev",
+      necessity: 0.8,
+    },
+    {
+      id: "e_linux_be",
+      source: "linux_cli",
+      target: "job_backend_dev",
+      necessity: 0.6,
+    },
+    {
+      id: "e_docker_be",
+      source: "docker",
+      target: "job_backend_dev",
+      necessity: 0.7,
+    },
+    {
+      id: "e_git_be",
+      source: "git",
+      target: "job_backend_dev",
+      necessity: 0.6,
+    },
+
+    // Data Analyst
+    {
+      id: "e_py_da",
+      source: "python",
+      target: "job_data_analyst",
+      necessity: 0.8,
+    },
+    {
+      id: "e_pd_da",
+      source: "pandas",
+      target: "job_data_analyst",
+      necessity: 0.9,
+    },
+    {
+      id: "e_np_da",
+      source: "numpy",
+      target: "job_data_analyst",
+      necessity: 0.7,
+    },
+    {
+      id: "e_sql_da",
+      source: "sql",
+      target: "job_data_analyst",
+      necessity: 0.9,
+    },
+    {
+      id: "e_viz_da",
+      source: "data_viz",
+      target: "job_data_analyst",
+      necessity: 0.85,
+    },
+    {
+      id: "e_stats_da",
+      source: "statistics",
+      target: "job_data_analyst",
+      necessity: 0.8,
+    },
+    {
+      id: "e_ab_da",
+      source: "ab_testing",
+      target: "job_data_analyst",
+      necessity: 0.6,
+    },
+
+    // ML Engineer
+    {
+      id: "e_py_ml",
+      source: "python",
+      target: "job_ml_engineer",
+      necessity: 0.9,
+    },
+    {
+      id: "e_ml_ml",
+      source: "ml_basics",
+      target: "job_ml_engineer",
+      necessity: 0.9,
+    },
+    {
+      id: "e_skl_ml",
+      source: "scikit_learn",
+      target: "job_ml_engineer",
+      necessity: 0.85,
+    },
+    {
+      id: "e_tf_ml",
+      source: "tensorflow",
+      target: "job_ml_engineer",
+      necessity: 0.8,
+    },
+    {
+      id: "e_torch_ml",
+      source: "pytorch",
+      target: "job_ml_engineer",
+      necessity: 0.8,
+    },
+    {
+      id: "e_np_ml",
+      source: "numpy",
+      target: "job_ml_engineer",
+      necessity: 0.8,
+    },
+    {
+      id: "e_docker_ml",
+      source: "docker",
+      target: "job_ml_engineer",
+      necessity: 0.6,
+    },
+    {
+      id: "e_aws_ml",
+      source: "aws_cloud",
+      target: "job_ml_engineer",
+      necessity: 0.6,
+    },
+    {
+      id: "e_k8s_ml",
+      source: "kubernetes",
+      target: "job_ml_engineer",
+      necessity: 0.5,
+    },
+    {
+      id: "e_sys_ml",
+      source: "system_design",
+      target: "job_ml_engineer",
+      necessity: 0.5,
+    },
+
+    // DevOps Engineer
+    {
+      id: "e_linux_devops",
+      source: "linux_cli",
+      target: "job_devops",
+      necessity: 0.9,
+    },
+    {
+      id: "e_docker_devops",
+      source: "docker",
+      target: "job_devops",
+      necessity: 0.9,
+    },
+    {
+      id: "e_k8s_devops",
+      source: "kubernetes",
+      target: "job_devops",
+      necessity: 0.9,
+    },
+    {
+      id: "e_cicd_devops",
+      source: "ci_cd",
+      target: "job_devops",
+      necessity: 0.9,
+    },
+    {
+      id: "e_mon_devops",
+      source: "monitoring",
+      target: "job_devops",
+      necessity: 0.85,
+    },
+    {
+      id: "e_aws_devops",
+      source: "aws_cloud",
+      target: "job_devops",
+      necessity: 0.9,
+    },
+    { id: "e_git_devops", source: "git", target: "job_devops", necessity: 0.7 },
+    {
+      id: "e_sys_devops",
+      source: "system_design",
+      target: "job_devops",
+      necessity: 0.7,
+    },
+
+    // Product Manager (Tech)
+    {
+      id: "e_agile_pm",
+      source: "agile_scrum",
+      target: "job_prod_manager",
+      necessity: 0.85,
+    },
+    {
+      id: "e_ps_pm",
+      source: "product_sense",
+      target: "job_prod_manager",
+      necessity: 0.9,
+    },
+    {
+      id: "e_sys_pm",
+      source: "system_design",
+      target: "job_prod_manager",
+      necessity: 0.6,
+    },
+    {
+      id: "e_viz_pm",
+      source: "data_viz",
+      target: "job_prod_manager",
+      necessity: 0.5,
+    },
+    {
+      id: "e_ab_pm",
+      source: "ab_testing",
+      target: "job_prod_manager",
+      necessity: 0.8,
+    },
+    {
+      id: "e_api_pm",
+      source: "api_design",
+      target: "job_prod_manager",
+      necessity: 0.6,
+    },
+    {
+      id: "e_sql_pm",
+      source: "sql",
+      target: "job_prod_manager",
+      necessity: 0.6,
+    },
   ],
 };
 
-// 如果你想在其他文件中使用它，请导出
 export default initialGraphData;
