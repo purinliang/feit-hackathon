@@ -7,6 +7,7 @@ import { Box, Stepper, Step, StepLabel, Typography, IconButton, createTheme, The
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import GraphPage from './pages/GraphPage'; // 导入 GraphPage 组件
 import ResultPage from './pages/ResultPage'; // 导入 ResultPage 组件
+import SurveyPage from './pages/SurveyPage'; // 导入新的问卷页
 import initialGraphData from './data/GraphData'; // 导入图表数据以获取节点信息
 
 // 创建深色主题
@@ -20,7 +21,7 @@ const darkTheme = createTheme({
 function MainApp() {
   const navigate = useNavigate();
   const location = useLocation();
-  const steps = ['Introduction', 'Graph Interaction', 'Results'];
+  const steps = ['Survey', 'Graph Interaction', 'Results'];
   const [activeStep, setActiveStep] = useState(0); // 0-indexed for array
 
   // 状态提升：将 Graph 的状态提升到 App 组件
@@ -48,12 +49,12 @@ function MainApp() {
 
   // 根据当前路由更新 activeStep
   useEffect(() => {
-    if (location.pathname === '/graph') {
+    if (location.pathname === '/' || location.pathname === '/survey') {
+      setActiveStep(0);
+    } else if (location.pathname === '/graph') {
       setActiveStep(1); // 'Graph Interaction' 是第二步 (索引 1)
     } else if (location.pathname === '/results') {
       setActiveStep(2); // 'Results' 是第三步 (索引 2)
-    } else {
-      setActiveStep(0); // 默认或 'Introduction'
     }
   }, [location.pathname]);
 
@@ -62,7 +63,8 @@ function MainApp() {
   };
 
   const handleNextPage = () => {
-    if (activeStep === 0) {
+    // Survey 页面有自己的导航，所以这个按钮从 step 1 开始工作
+    if (activeStep === 1) {
       navigate('/graph');
     } else if (activeStep === 1) {
       navigate('/results');
@@ -71,6 +73,10 @@ function MainApp() {
       // 可以选择在这里重定向到首页或显示最终完成信息
       // navigate('/');
     }
+  };
+
+  const handleSurveyComplete = () => {
+    navigate('/graph');
   };
 
   const isFirstStep = activeStep === 0;
@@ -89,7 +95,7 @@ function MainApp() {
           borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
         }}
       >
-        <IconButton onClick={handleBack} disabled={isFirstStep} color="inherit">
+        <IconButton onClick={handleBack} disabled={isFirstStep} color="inherit" sx={{ visibility: isFirstStep ? 'hidden' : 'visible' }}>
           <ArrowBackIosNew />
         </IconButton>
         <Box sx={{ width: '100%', maxWidth: '800px', mx: 2 }}>
@@ -101,7 +107,7 @@ function MainApp() {
             ))}
           </Stepper>
         </Box>
-        <IconButton onClick={handleNextPage} disabled={isLastStep} color="inherit">
+        <IconButton onClick={handleNextPage} disabled={isLastStep} color="inherit" sx={{ visibility: isFirstStep ? 'hidden' : 'visible' }}>
           <ArrowForwardIos />
         </IconButton>
       </Box>
@@ -109,7 +115,7 @@ function MainApp() {
       {/* 页面内容区域 */}
       <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Box
-          sx={{
+          sx={isFirstStep ? { width: '100%', height: '100%' } : {
             width: 800,
             height: 600,
             bgcolor: 'grey.900', // 给内容区一个稍亮的背景以区分
@@ -122,7 +128,8 @@ function MainApp() {
           }}
         >
           <Routes>
-            <Route path="/" element={<Typography variant="h4">Welcome! Click the arrow to start.</Typography>} />
+            <Route path="/" element={<SurveyPage onComplete={handleSurveyComplete} setLearnedSkillIds={setLearnedSkillIds} />} />
+            <Route path="/survey" element={<SurveyPage onComplete={handleSurveyComplete} setLearnedSkillIds={setLearnedSkillIds} />} />
             <Route
               path="/graph"
               element={
