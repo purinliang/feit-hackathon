@@ -19,6 +19,63 @@ function Graph({
 }) {
   const fgRef = useRef();
 
+  // 🎨 统一颜色配置
+/**
+
+  const COLORS = {
+    background: "#1f2937", // 背景色 (Tailwind gray-800)
+
+    node: {
+      skillDefault: "#EE5555", // 默认 skill 节点
+      jobDefault: "#4444FF",   // 默认 job 节点
+      learned: "green",        // 已学习技能
+      recommendedJob: "blue",  // 推荐岗位
+      highlight: "orange",     // 高亮状态
+      hover: "red",            // 悬停状态
+    },
+
+    text: {
+      default: "grey",
+      highlight: "white",
+    },
+
+    link: {
+      default: (necessity) =>
+        `rgba(${Math.round(255 * necessity) / 1.1}, ${Math.round(
+          255 * necessity
+        )}, ${Math.round(255 * necessity) / 1.1}, 0.3)`,
+      recommended: "orange",
+    },
+  };
+
+*/
+  const COLORS = {
+    background: "#000000", // 🖤 纯黑背景（极简冷感）
+
+    node: {
+      skillDefault: "#60a5fa",    // 冷淡浅蓝  (Tailwind blue-400)
+      jobDefault: "#a5b4fc",      // 柔和淡紫  (Tailwind indigo-300)
+      learned: "#34d399",         // 清冷薄荷绿 (Tailwind emerald-400)
+      recommendedJob: "#fbbf24",  // 柔和琥珀橙 (Tailwind amber-400)
+      highlight: "#f472b6",       // 柔粉紫，用于 hover 高亮
+      hover: "#f87171",           // 低饱和珊瑚红 (Tailwind red-400)
+    },
+
+    text: {
+      default: "#cbd5e1",   // 冷灰蓝文字 (Tailwind slate-300)
+      highlight: "#f8fafc", // 几乎纯白 (Tailwind slate-50)
+    },
+
+    link: {
+      default: (necessity) =>
+        `rgba(${96 + necessity * 30}, ${165 + necessity * 20}, ${250}, ${0.25 + necessity * 0.15})`,
+      recommended: "#fbbf24", // 与 recommendedJob 保持一致
+    },
+  };
+
+
+
+
   // 1. 使用 useMemo 确保映射关系和数据稳定
   const { nodeNameIDToGraphID, nodeGraphIDToOrigNode, predecessorsMap } =
     useMemo(() => {
@@ -192,19 +249,11 @@ function Graph({
       const graphID = nodeNameIDToGraphID[node.id];
       const origType = nodeGraphIDToOrigNode[graphID].type;
 
-      if (origType === "skill") {
-        return "#EE5555"; // 浅红色 (Tailwind Red-500)
-      } else {
-        return "#4444FF"; // 浅蓝色 (Tailwind Blue-400)
-      }
+      return origType === "skill"
+        ? COLORS.node.skillDefault
+        : COLORS.node.jobDefault;
     },
-    [
-      learnedSkillIds,
-      recommendedJobId,
-      nodeNameIDToGraphID,
-      nodeGraphIDToOrigNode,
-      isSkillRecommended,
-    ]
+    [nodeNameIDToGraphID, nodeGraphIDToOrigNode]
   );
 
   const getLinkWidth = useCallback((link) => {
@@ -215,14 +264,16 @@ function Graph({
     return link.necessity < 0.7 ? [10, 5] : [];
   });
 
-  const getLinkColor = useCallback((link) => {
-    // Default color: rgba(209, 213, 219, 0.4)
-    if (recommendedLinks.has(link)) {
-      return "orange";
-    }
-    const value = Math.round(255 * link.necessity);
-    return `rgba(${value / 1.1}, ${value}, ${value / 1.1}, 0.3)`;
-  });
+  const getLinkColor = useCallback(
+    (link) => {
+      if (recommendedLinks.has(link)) {
+        return COLORS.link.recommended;
+      }
+      return COLORS.link.default(link.necessity);
+    },
+    [recommendedLinks]
+  );
+
 
   const getParticlesCount = useCallback((link) => {
     if (recommendedLinks.has(link)) {
@@ -278,35 +329,35 @@ function Graph({
 
   const NODE_R = 5;
   const paintNode = (node, ctx, globalScale) => {
-    let textColor = "grey";
+    let textColor = COLORS.text.default;
+
     if (highlightNodes.has(node)) {
-      textColor = "white";
+      textColor = COLORS.text.highlight;
     }
+
     let extraText = "";
+
     if (learnedNodes.has(node)) {
       ctx.beginPath();
       ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-      ctx.fillStyle = node === hoverNode ? "red" : "green";
+      ctx.fillStyle = node === hoverNode ? COLORS.node.hover : COLORS.node.learned;
       ctx.fill();
-
       extraText = " (learned)";
     } else {
       const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
       if (recommendedNodes.has(node) && origNode.type === "job") {
-        // too many, not show anything unless job
         ctx.beginPath();
         ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-        ctx.fillStyle = node === hoverNode ? "red" : "blue";
+        ctx.fillStyle =
+          node === hoverNode ? COLORS.node.hover : COLORS.node.recommendedJob;
         ctx.fill();
         extraText = " (current goal)";
       } else if (highlightNodes.has(node)) {
-        // add ring just for highlighted nodes
         ctx.beginPath();
         ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-        ctx.fillStyle = node === hoverNode ? "red" : "orange";
+        ctx.fillStyle =
+          node === hoverNode ? COLORS.node.hover : COLORS.node.highlight;
         ctx.fill();
-
-        textColor = "white";
       }
     }
 
@@ -316,12 +367,11 @@ function Graph({
 
     ctx.font = `${fontSize}px Inter, sans-serif`;
     ctx.textAlign = "center";
-    ctx.textBaseline = "bottom"; // 将基线设置为底部，使文本位于节点正上方
-
-    // 优化文字颜色：默认白色，推荐/已学习状态使用亮绿色
+    ctx.textBaseline = "bottom";
     ctx.fillStyle = textColor;
-    ctx.fillText(label + extraText, node.x, node.y - 7); // 在节点上方留出一点空隙
+    ctx.fillText(label + extraText, node.x, node.y - 7);
   };
+
 
   useEffect(() => {
     updateLR();
