@@ -400,7 +400,8 @@ function Graph({
         // =========================================================
         backgroundColor="#1f2937" // 深灰色背景 (Tailwind gray-800)
         // =========================================================
-        nodeCanvasObjectMode={(node) => "before"}
+        //nodeCanvasObjectMode={(node) => "before"}
+        nodeCanvasObjectMode={(node) => "after"}
         nodeCanvasObject={paintNode}
         nodeRelSize={6}
         dagMode="zin"
