@@ -1,38 +1,33 @@
 import ForceGraph2D from "react-force-graph-2d";
+import initialGraphData from "../data/GraphData";
 
 function Graph(props) {
+  const nodeNameIDToGraphID = {};
+
+  initialGraphData.nodes.forEach(
+    (node, index) => (nodeNameIDToGraphID[node.id] = index)
+  );
+
   const myData = {
-    nodes: [
-      {
-        id: "id1",
-        name: "name1",
-        val: 1,
-      },
-      {
-        id: "id2",
-        name: "name2",
-        val: 10,
-      },
-      {
-        id: "id3",
-        name: "name3",
-        val: 5,
-      },
-    ],
-    links: [
-      {
-        source: "id1",
-        target: "id2",
-      },
-      {
-        source: "id1",
-        target: "id3",
-      },
-    ],
+    nodes: initialGraphData.nodes.map((node, index) => {
+      return {
+        id: index,
+        name: node.name,
+        val: node.value,
+      };
+    }),
+    links: initialGraphData.edges.map((edge, index) => {
+      return {
+        source: nodeNameIDToGraphID[edge.source],
+        target: nodeNameIDToGraphID[edge.target],
+      };
+    }),
   };
 
+  console.log(myData);
+
   return (
-    <div style={{ width: "100%", height: "400px" }}>
+    <div style={{ width: "900px", height: "400px" }}>
       <ForceGraph2D graphData={myData} />
     </div>
   );
