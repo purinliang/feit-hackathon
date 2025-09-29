@@ -158,12 +158,12 @@ function SectionBasic({ basic, setBasic }) {
   const handleChange = (e) => setBasic({ ...basic, [e.target.name]: e.target.value });
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Typography variant="h5" sx={{ mb: 2 }} gutterBottom>1) Basic Info</Typography>
-      <TextField fullWidth label="Name" name="name" value={basic.name} onChange={handleChange} />
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Typography variant="h5" gutterBottom sx={{ mb: 1 }}>1) Basic Info</Typography>
+      <TextField fullWidth label="Name" name="name" value={basic.name} onChange={handleChange} variant="outlined" />
       <MuiSelect label="Age Band" name="ageBand" value={basic.ageBand} onChange={handleChange} options={["<18", "18–22", "23–27", "28–34", "35–44", "45+"]} />
       <MuiSelect label="Highest Education" name="edu" value={basic.edu} onChange={handleChange} options={["Associate", "Bachelor", "Master", "PhD", "Other"]} />
-      <TextField fullWidth label="Major / Field" name="major" value={basic.major} onChange={handleChange} placeholder="e.g., Computer Science" />
+      <TextField fullWidth label="Major / Field" name="major" value={basic.major} onChange={handleChange} placeholder="e.g., Computer Science" variant="outlined" />
       <MuiSelect label="Current Status" name="status" value={basic.status} onChange={handleChange} options={["Studying", "Job Seeking", "Employed - Open to Change", "Freelancing", "Founding/Startup"]} />
       <MuiSelect label="Work/Internship Years" name="years" value={basic.years} onChange={handleChange} options={["0", "<1", "1–2", "3–5", "6–9", "10+"]} />
     </Box>
@@ -173,8 +173,8 @@ function SectionBasic({ basic, setBasic }) {
 function SectionPersonality({ answers, setAnswers }) {
   return (
     <Box>
-      <Typography variant="h5" sx={{ mb: 2 }} gutterBottom>2) Personality</Typography>
-      <Typography variant="caption" display="block" color="text.secondary" gutterBottom>1 = Strongly Disagree · 5 = Strongly Agree</Typography>
+      <Typography variant="h5" gutterBottom sx={{ mb: 1 }}>2) Personality</Typography>
+      <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2 }}>1 = Strongly Disagree · 5 = Strongly Agree</Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {personalityQuestions.map((q) => (
           <Box key={q.id} sx={{ p: 2, border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 1, textAlign: 'left' }}>
@@ -200,7 +200,7 @@ function SectionSkillsPrefs({ skillsText, setSkillsText, prefs, setPrefs }) {
 
   return (
     <Box>
-      <Typography variant="h5" sx={{ mb: 2 }} gutterBottom>3) Skills & Preferences</Typography>
+      <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>3) Skills & Preferences</Typography>
       <TextField
         fullWidth
         multiline
@@ -208,19 +208,19 @@ function SectionSkillsPrefs({ skillsText, setSkillsText, prefs, setPrefs }) {
         label="What skills do you currently possess? (comma separated)"
         value={skillsText}
         onChange={(e) => setSkillsText(e.target.value)}
-        placeholder="e.g., Python, React, SQL, Docker"
-        sx={{ mb: 3 }}
+        placeholder="e.g., python, react, sql, docker"
+        variant="outlined"
       />
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 3 }}>
         <FormControl component="fieldset" fullWidth>
-          <Typography component="legend" sx={{ mb: 1 }}>Target Roles (multi-select)</Typography>
+          <Typography component="legend" variant="body1" sx={{ mb: 1 }}>Target Roles (multi-select)</Typography>
           <FormGroup>
             {roleOptions.map(opt => <FormControlLabel key={opt} control={<Checkbox checked={prefs.roles.includes(opt)} onChange={() => handleCheckboxChange('roles', opt)} />} label={opt} />)}
           </FormGroup>
         </FormControl>
 
         <FormControl component="fieldset" fullWidth>
-          <Typography component="legend" sx={{ mb: 1 }}>Target Industries (multi-select)</Typography>
+          <Typography component="legend" variant="body1" sx={{ mb: 1 }}>Target Industries (multi-select)</Typography>
           <FormGroup>
             {industryOptions.map(opt => <FormControlLabel key={opt} control={<Checkbox checked={prefs.industries.includes(opt)} onChange={() => handleCheckboxChange('industries', opt)} />} label={opt} />)}
           </FormGroup>
@@ -245,26 +245,26 @@ function SectionSummary({ basic, personality, skillsText, prefs }) {
 
   return (
     <Box>
-      <Typography variant="h5" sx={{ mb: 2 }} gutterBottom>4) Summary</Typography>
+      <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>4) Summary</Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ p: 2, border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 1, textAlign: 'left' }}>
-          <Typography variant="h6" gutterBottom align="left">Basic Info</Typography>
-          <Typography align="left"><strong>Name:</strong> {basic.name || "-"}</Typography>
-          <Typography align="left"><strong>Education:</strong> {basic.edu || "-"}</Typography>
-          <Typography align="left"><strong>Status:</strong> {basic.status || "-"}</Typography>
+          <Typography variant="h6" gutterBottom align="left" sx={{ lineHeight: 1.5 }}>Basic Info</Typography>
+          <Typography align="left" sx={{ lineHeight: 1.7 }}><strong>Name:</strong> {basic.name || "-"}</Typography>
+          <Typography align="left" sx={{ lineHeight: 1.7 }}><strong>Education:</strong> {basic.edu || "-"}</Typography>
+          <Typography align="left" sx={{ lineHeight: 1.7 }}><strong>Status:</strong> {basic.status || "-"}</Typography>
         </Box>
 
         <Box sx={{ p: 2, border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 1, textAlign: 'left' }}>
-          <Typography variant="h6" gutterBottom align="left">Personality (MBTI-style)</Typography>
-          <Typography variant="h4" align="left">{mbti}</Typography>
+          <Typography variant="h6" gutterBottom align="left" sx={{ lineHeight: 1.5 }}>Personality (MBTI-style)</Typography>
+          <Typography variant="h4" align="left" sx={{ lineHeight: 1.7 }}>{mbti}</Typography>
         </Box>
 
         <Box sx={{ p: 2, border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 1, textAlign: 'left' }}>
-          <Typography variant="h6" gutterBottom align="left">Skills & Preferences</Typography>
-          <Typography align="left"><strong>Skills:</strong> {skillsText || "-"}</Typography>
-          <Typography align="left"><strong>Target Roles:</strong> {prefs.roles.join(', ') || "-"}</Typography>
-          <Typography align="left"><strong>Target Industries:</strong> {prefs.industries.join(', ') || "-"}</Typography>
-          <Typography align="left"><strong>Work Mode:</strong> {prefs.workMode || "-"}</Typography>
+          <Typography variant="h6" gutterBottom align="left" sx={{ lineHeight: 1.5 }}>Skills & Preferences</Typography>
+          <Typography align="left" sx={{ lineHeight: 1.7 }}><strong>Skills:</strong> {skillsText || "-"}</Typography>
+          <Typography align="left" sx={{ lineHeight: 1.7 }}><strong>Target Roles:</strong> {prefs.roles.join(', ') || "-"}</Typography>
+          <Typography align="left" sx={{ lineHeight: 1.7 }}><strong>Target Industries:</strong> {prefs.industries.join(', ') || "-"}</Typography>
+          <Typography align="left" sx={{ lineHeight: 1.7 }}><strong>Work Mode:</strong> {prefs.workMode || "-"}</Typography>
         </Box>
       </Box>
     </Box>

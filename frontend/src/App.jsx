@@ -21,7 +21,7 @@ const darkTheme = createTheme({
 function MainApp() {
   const navigate = useNavigate();
   const location = useLocation();
-  const steps = ['Survey', 'Graph Interaction', 'Results'];
+  const steps = ['Survey', 'Career Graph', 'Results'];
   const [activeStep, setActiveStep] = useState(0); // 0-indexed for array
 
   // 状态提升：将 Graph 的状态提升到 App 组件
