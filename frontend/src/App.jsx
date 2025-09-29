@@ -63,12 +63,12 @@ function MainApp() {
   };
 
   const handleNextPage = () => {
-    // Survey 页面有自己的导航，所以这个按钮从 step 1 开始工作
-    if (activeStep === 1) {
+    // 当在图表页 (activeStep=1) 时，导航到结果页
+    if (activeStep === 0) {
       navigate('/graph');
     } else if (activeStep === 1) {
       navigate('/results');
-    } else if (activeStep === 2) {
+    } else if (activeStep >= steps.length - 1) {
       console.log("Finished all steps!");
       // 可以选择在这里重定向到首页或显示最终完成信息
       // navigate('/');
@@ -76,7 +76,8 @@ function MainApp() {
   };
 
   const handleSurveyComplete = () => {
-    navigate('/graph');
+    // 使用 { replace: false } 确保这是一个 push 操作，从而保留历史记录
+    navigate('/graph', { replace: false });
   };
 
   const isFirstStep = activeStep === 0;
@@ -84,33 +85,35 @@ function MainApp() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
-      {/* 顶部进度条和Next Page按钮 */}
-      <Box
-        sx={{
-          width: '100%',
-          p: 2,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-        }}
-      >
-        <IconButton onClick={handleBack} disabled={isFirstStep} color="inherit" sx={{ visibility: isFirstStep ? 'hidden' : 'visible' }}>
-          <ArrowBackIosNew />
-        </IconButton>
-        <Box sx={{ width: '100%', maxWidth: '800px', mx: 2 }}>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+      {/* 顶部进度条和Next Page按钮 - 仅在非问卷页显示 */}
+      {!isFirstStep && (
+        <Box
+          sx={{
+            width: '100%',
+            p: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+          }}
+        >
+          <IconButton onClick={handleBack} color="inherit">
+            <ArrowBackIosNew />
+          </IconButton>
+          <Box sx={{ width: '100%', maxWidth: '800px', mx: 2 }}>
+            <Stepper activeStep={activeStep} alternativeLabel>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
+          <IconButton onClick={handleNextPage} disabled={isLastStep} color="inherit">
+            <ArrowForwardIos />
+          </IconButton>
         </Box>
-        <IconButton onClick={handleNextPage} disabled={isLastStep} color="inherit" sx={{ visibility: isFirstStep ? 'hidden' : 'visible' }}>
-          <ArrowForwardIos />
-        </IconButton>
-      </Box>
+      )}
 
       {/* 页面内容区域 */}
       <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
