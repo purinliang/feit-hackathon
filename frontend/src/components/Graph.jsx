@@ -135,12 +135,12 @@ function Graph({
       const u = link.source;
       const v = link.target;
       const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[v.id]];
-      console.log(link);
       if (
         learnedSkillIds.has(u.id) &&
         (origNode.type === "skill"
           ? isSkillRecommended(v.id)
-          : recommendedJobId === v.id)
+          : recommendedJobId === v.id) &&
+        !learnedSkillIds.has(v.id)
       ) {
         recommendedLinks.add(link);
       }
@@ -374,7 +374,7 @@ function Graph({
         // Link strength based on x value
         linkStrength={(link) => {
           // normalize or cap values if needed
-          return Math.min(1, Math.max(0.1, link.necessity / 100));
+          return Math.min(1, Math.max(0.3, link.necessity));
         }}
         linkDistance={100} // default link length
       />
