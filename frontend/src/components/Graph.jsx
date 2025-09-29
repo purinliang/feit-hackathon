@@ -75,11 +75,16 @@ function Graph({
 
   // 📐 统一尺寸样式配置
   const GRAPH_STYLE = {
-    nodeRelSize: 4,        // 全局节点半径
-    nodeRadius: 3.5,       // 自定义绘制时的圆/环半径
-    fontSize: 10,          // 文本基准字号（与 globalScale 相乘）
-    labelYOffset: 5,       // 标签文字相对圆心的上移距离
+    nodeRelSize: 4,      // 全局节点基础半径（ForceGraph2D）
+    nodeRadius: 3.5,     // 你自绘时的基准半径
+    ringWidth: 2,        // 环线宽
+    learnedScale: 1.35,  // learned 环的放大系数
+    recommendedScale: 1.35, // recommended job 环放大系数
+    highlightScale: 1.15,   // ✅ 高亮“实心”的放大系数（比默认略大一点）
+    fontSize: 10,
+    labelYOffset: 5,
   };
+
 
 
 
@@ -342,25 +347,42 @@ function Graph({
     let textColor = COLORS.text.default;
     if (highlightNodes.has(node)) textColor = COLORS.text.highlight;
 
-    const ring = (color) => {
+    // 画“环”
+    const ring = (color, scale) => {
       ctx.beginPath();
-      ctx.arc(node.x, node.y, NODE_R * 1.6, 0, 2 * Math.PI);
-      ctx.lineWidth = 2;
+      ctx.arc(node.x, node.y, NODE_R * scale, 0, 2 * Math.PI);
+      ctx.lineWidth = GRAPH_STYLE.ringWidth;
       ctx.strokeStyle = color;
       ctx.stroke();
     };
 
     if (learnedNodes.has(node)) {
-      ring(node === hoverNode ? COLORS.node.hover : COLORS.node.learned);
+      // ✅ learned：仍然用环
+      ring(node === hoverNode ? COLORS.node.hover : COLORS.node.learned,
+          GRAPH_STYLE.learnedScale);
     } else {
       const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
       if (recommendedNodes.has(node) && origNode.type === "job") {
-        ring(node === hoverNode ? COLORS.node.hover : COLORS.node.recommendedJob);
+        // ✅ recommended job：仍然用环
+        ring(node === hoverNode ? COLORS.node.hover : COLORS.node.recommendedJob,
+            GRAPH_STYLE.recommendedScale);
       } else if (highlightNodes.has(node)) {
-        ring(node === hoverNode ? COLORS.node.hover : COLORS.node.highlight);
+        // ✅ highlight：改成“实心 + 更小半径”
+        ctx.beginPath();
+        ctx.arc(
+          node.x,
+          node.y,
+          NODE_R * GRAPH_STYLE.highlightScale, // 比默认圆略小一点
+          0,
+          2 * Math.PI
+        );
+        ctx.fillStyle =
+          node === hoverNode ? COLORS.node.hover : COLORS.node.highlight;
+        ctx.fill();
       }
     }
 
+    // 文本
     const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
     const label = getNodeLabel(origNode);
     const fontSize = GRAPH_STYLE.fontSize / globalScale;
