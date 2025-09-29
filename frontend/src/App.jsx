@@ -1,11 +1,12 @@
+// src/App.jsx
+
 import {
-  ReactFlow, // 修正：现在 ReactFlow 在大括号内
+  ReactFlow,
   Controls,
   Background,
   useNodesState,
   useEdgesState
 } from '@xyflow/react';
-
 import CustomNode from './components/CustomNode';
 import { getInitialElements } from './utils/dataTransformer';
 
@@ -15,13 +16,25 @@ const nodeTypes = {
   jobNode: CustomNode,
 };
 
-
-
 const initialElements = getInitialElements();
 
+// *** 新增：默认边的配置 ***
+const defaultEdgeOptions = {
+  // 强制使用直线连接
+  type: 'default',
+  // 设置箭头的样式 (arrowclosed 是一个实心三角形箭头)
+  markerEnd: {
+    type: 'arrowclosed',
+    width: 8, // 箭头宽度
+    height: 8, // 箭头高度
+    color: '#555', // 箭头颜色
+  },
+};
+// **************************
+
 function CareerGraph() {
-  // 使用 React Flow 的 hooks 管理节点和边状态
   const [nodes, setNodes] = useNodesState(initialElements.nodes);
+  // 注意：这里我们使用 getInitialElements 返回的边，但我们会在下一步修改它的数据结构。
   const [edges, setEdges] = useEdgesState(initialElements.edges);
 
   return (
@@ -29,8 +42,10 @@ function CareerGraph() {
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        nodeTypes={nodeTypes} // 传入自定义节点类型
-        fitView // 确保图表在初始时完全可见
+        nodeTypes={nodeTypes}
+        // 应用新的默认边选项
+        defaultEdgeOptions={defaultEdgeOptions}
+        fitView
       >
         <Controls />
         <Background variant="dots" gap={12} size={1} />

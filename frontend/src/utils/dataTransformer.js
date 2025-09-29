@@ -12,12 +12,20 @@ const nodeHeight = 36;
 // ==========================================================
 // 1. 自动布局函数 (使用 Dagre)
 // ==========================================================
-const getLayoutedElements = (nodes, edges, direction = 'TB') => {
+const getLayoutedElements = (nodes, edges, direction = 'LR') => {
     const dagreGraph = new dagre.graphlib.Graph();
     dagreGraph.setDefaultEdgeLabel(() => ({}));
 
     const isHorizontal = direction === 'LR';
-    dagreGraph.setGraph({ rankdir: direction });
+
+    // *** 关键：设置布局参数，增加节点间距 ***
+    dagreGraph.setGraph({
+        // *** 关键修改：方向设置为 LR (Left-to-Right) ***
+        rankdir: direction, // 现在 direction 默认为 'LR'
+        ranksep: 100,
+        nodesep: 50,
+    });
+    // *******************************************
 
     // 1. 设置图中的所有节点
     nodes.forEach((node) => {
@@ -72,12 +80,18 @@ export const getInitialElements = () => {
         id: edge.id,
         source: edge.source,
         target: edge.target,
-        // 添加 label 来显示依赖度
-        label: `${(edge.necessity * 100).toFixed(0)}% 依赖`,
-        // 样式可以根据依赖度变化，例如加粗
-        style: { strokeWidth: edge.necessity * 4 },
+        // *** 移除 label，不再显示百分比文字 ***
+        // label: `${(edge.necessity * 100).toFixed(0)}% 依赖`, 
+
+        // *** 关键修改：用线的粗细表示依赖性 ***
+        style: {
+            // 将依赖度 (0.00 ~ 1.00) 映射到线宽 (例如 1px 到 5px)
+            strokeWidth: edge.necessity * 4 + 1, // 粗细范围约 1px (低) 到 5px (高)
+            stroke: '#555', // 设置线的颜色
+        },
+        // *******************************************
     }));
 
     // 应用自动布局
-    return getLayoutedElements(rfNodes, rfEdges, 'TB');
+    return getLayoutedElements(rfNodes, rfEdges, 'LR');
 };

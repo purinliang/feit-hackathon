@@ -5,17 +5,17 @@ import { Handle, Position } from '@xyflow/react';
 const CustomNode = ({ data, isConnectable }) => {
     const isJob = data.type === 'job';
 
-    // *** 节点的核心样式修改 ***
+    // 节点的整体样式 (保持圆形)
     const nodeStyle = {
-        width: '60px',        // 宽度
-        height: '60px',       // 高度
-        borderRadius: '50%',  // 关键：实现圆形效果
-        display: 'flex',      // 启用 flexbox 布局
-        alignItems: 'center', // 垂直居中
-        justifyContent: 'center', // 水平居中
+        width: '60px',
+        height: '60px',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
 
-        // 简化后的外观
-        border: isJob ? '3px solid #337ab7' : '2px solid #5cb85c', // 职业和技能颜色区分
+        // 职业和技能颜色区分
+        border: isJob ? '3px solid #337ab7' : '2px solid #5cb85c',
         backgroundColor: isJob ? '#e6f7ff' : '#f9fff9',
         textAlign: 'center',
         boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
@@ -26,28 +26,28 @@ const CustomNode = ({ data, isConnectable }) => {
         fontWeight: 'bold',
         fontSize: '0.8em',
         color: '#333',
-        // 隐藏其他细节，只保留名字
-        whiteSpace: 'pre-wrap', // 允许名字换行
+        whiteSpace: 'pre-wrap',
         padding: '5px',
         lineHeight: '1.2'
     };
 
-    // *** 确保 Handle 的样式在圆形节点上正确显示 ***
-    // Handle 的位置也需要是百分比来保持居中
-    const handleStyle = {
-        width: '10px',
-        height: '10px',
-        background: '#555',
+    // *** 关键修改：隐藏 Handle 的样式 ***
+    const hiddenHandleStyle = {
+        // 关键：将 Handle 的尺寸设置为 0，或者设置透明度，让它不可见
+        width: '0px',
+        height: '0px',
+        opacity: 0,
+        // 确保它仍然可以接收点击，但这里我们主要靠边自己连
     };
 
     return (
         <div style={nodeStyle}>
-            {/* Target Handle (上方) */}
+            {/* 1. Target Handle (入口) - 放在左侧 (Position.Left) */}
             <Handle
                 type="target"
-                position={Position.Top}
+                position={Position.Left} // <--- 调整到左边
                 isConnectable={isConnectable}
-                style={{ ...handleStyle, top: '-5px' }} // 微调位置
+                style={hiddenHandleStyle} // <--- 使用隐藏样式
             />
 
             {/* 节点名称 (核心内容) */}
@@ -55,12 +55,12 @@ const CustomNode = ({ data, isConnectable }) => {
                 {data.name}
             </div>
 
-            {/* Source Handle (下方) */}
+            {/* 2. Source Handle (出口) - 放在右侧 (Position.Right) */}
             <Handle
                 type="source"
-                position={Position.Bottom}
+                position={Position.Right} // <--- 调整到右边
                 isConnectable={isConnectable}
-                style={{ ...handleStyle, bottom: '-5px' }} // 微调位置
+                style={hiddenHandleStyle} // <--- 使用隐藏样式
             />
         </div>
     );
