@@ -53,8 +53,8 @@ function Graph({
     background: "#000000", // 🖤 纯黑背景（极简冷感）
 
     node: {
-      skillDefault: "#60a5fa",    // 冷淡浅蓝  (Tailwind blue-400)
-      jobDefault: "#a5b4fc",      // 柔和淡紫  (Tailwind indigo-300)
+      skillDefault: "#38bdf8", // 明亮天蓝 (sky-400)
+      jobDefault:   "#a78bfa", // 柔淡紫 (violet-400)
       learned: "#34d399",         // 清冷薄荷绿 (Tailwind emerald-400)
       recommendedJob: "#fbbf24",  // 柔和琥珀橙 (Tailwind amber-400)
       highlight: "#f472b6",       // 柔粉紫，用于 hover 高亮
@@ -71,6 +71,14 @@ function Graph({
         `rgba(${96 + necessity * 30}, ${165 + necessity * 20}, ${250}, ${0.25 + necessity * 0.15})`,
       recommended: "#fbbf24", // 与 recommendedJob 保持一致
     },
+  };
+
+  // 📐 统一尺寸样式配置
+  const GRAPH_STYLE = {
+    nodeRelSize: 4,        // 全局节点半径
+    nodeRadius: 3.5,       // 自定义绘制时的圆/环半径
+    fontSize: 10,          // 文本基准字号（与 globalScale 相乘）
+    labelYOffset: 5,       // 标签文字相对圆心的上移距离
   };
 
 
@@ -327,50 +335,42 @@ function Graph({
     updateHighlight();
   };
 
-  const NODE_R = 5;
+
+  const NODE_R = GRAPH_STYLE.nodeRadius;
+
   const paintNode = (node, ctx, globalScale) => {
     let textColor = COLORS.text.default;
+    if (highlightNodes.has(node)) textColor = COLORS.text.highlight;
 
-    if (highlightNodes.has(node)) {
-      textColor = COLORS.text.highlight;
-    }
-
-    let extraText = "";
+    const ring = (color) => {
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, NODE_R * 1.6, 0, 2 * Math.PI);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+    };
 
     if (learnedNodes.has(node)) {
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-      ctx.fillStyle = node === hoverNode ? COLORS.node.hover : COLORS.node.learned;
-      ctx.fill();
-      extraText = " (learned)";
+      ring(node === hoverNode ? COLORS.node.hover : COLORS.node.learned);
     } else {
       const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
       if (recommendedNodes.has(node) && origNode.type === "job") {
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-        ctx.fillStyle =
-          node === hoverNode ? COLORS.node.hover : COLORS.node.recommendedJob;
-        ctx.fill();
-        extraText = " (current goal)";
+        ring(node === hoverNode ? COLORS.node.hover : COLORS.node.recommendedJob);
       } else if (highlightNodes.has(node)) {
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-        ctx.fillStyle =
-          node === hoverNode ? COLORS.node.hover : COLORS.node.highlight;
-        ctx.fill();
+        ring(node === hoverNode ? COLORS.node.hover : COLORS.node.highlight);
       }
     }
 
     const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
     const label = getNodeLabel(origNode);
-    const fontSize = 14 / globalScale;
-
+    const fontSize = GRAPH_STYLE.fontSize / globalScale;
     ctx.font = `${fontSize}px Inter, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
     ctx.fillStyle = textColor;
-    ctx.fillText(label + extraText, node.x, node.y - 7);
+    ctx.fillText(label, node.x, node.y - GRAPH_STYLE.labelYOffset);
   };
+
 
 
   useEffect(() => {
@@ -404,7 +404,7 @@ function Graph({
         //nodeCanvasObjectMode={(node) => "before"}
         nodeCanvasObjectMode={(node) => "after"}
         nodeCanvasObject={paintNode}
-        nodeRelSize={6}
+        nodeRelSize={GRAPH_STYLE.nodeRelSize}
         dagMode="zin"
         onNodeClick={handleClick}
         linkWidth={getLinkWidth}
