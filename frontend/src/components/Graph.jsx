@@ -67,9 +67,14 @@ function Graph({
     },
 
     link: {
-      default: (necessity) =>
-        `rgba(${96 + necessity * 30}, ${165 + necessity * 20}, ${250}, ${0.25 + necessity * 0.15})`,
-      recommended: "#fbbf24", // 与 recommendedJob 保持一致
+      default: (necessity) => {
+        const a =
+          GRAPH_STYLE.linkAlpha.min +
+          (GRAPH_STYLE.linkAlpha.max - GRAPH_STYLE.linkAlpha.min) *
+          Math.pow(necessity, GRAPH_STYLE.linkAlpha.gamma);
+        return `rgba(${96 + necessity * 30}, ${165 + necessity * 20}, 250, ${a})`;
+      },
+      recommended: "#fbbf24",
     },
   };
 
@@ -77,12 +82,13 @@ function Graph({
   const GRAPH_STYLE = {
     nodeRelSize: 4,      // 全局节点基础半径（ForceGraph2D）
     nodeRadius: 3.5,     // 你自绘时的基准半径
-    ringWidth: 2,        // 环线宽
+    ringWidth: 1,        // 环线宽
     learnedScale: 1.35,  // learned 环的放大系数
     recommendedScale: 1.35, // recommended job 环放大系数
     highlightScale: 1.15,   // ✅ 高亮“实心”的放大系数（比默认略大一点）
     fontSize: 10,
     labelYOffset: 5,
+    linkAlpha: { min: 0.06, max: 0.8, gamma: 1.4 } // α范围更大 + 非线性
   };
 
 
@@ -270,7 +276,7 @@ function Graph({
   );
 
   const getLinkWidth = useCallback((link) => {
-    return highlightLinks.has(link) ? 5 : link.necessity * 4;
+    return highlightLinks.has(link) ? 2.5 : Math.max(0.4, link.necessity * 1.6)
   });
 
   const getLinkDash = useCallback((link) => {
@@ -435,7 +441,7 @@ function Graph({
         linkColor={getLinkColor}
         onNodeHover={handleNodeHover}
         onLinkHover={handleLinkHover}
-        linkDirectionalArrowLength={6}
+        linkDirectionalArrowLength={4}
         linkDirectionalArrowRelPos={1}
         linkDirectionalParticles={getParticlesCount}
         /** 
