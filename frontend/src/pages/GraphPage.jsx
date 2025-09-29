@@ -2,17 +2,24 @@ import React from 'react';
 import { Box } from '@mui/material';
 import Graph from '../components/Graph';
 
-function GraphPage({ graphWidth, graphHeight }) {
+function GraphPage({
+    width,
+    height,
+    learnedSkillIds,
+    setLearnedSkillIds,
+    recommendedJobId,
+    setRecommendedJobId,
+}) {
     return (
         <Box
             sx={{
-                width: graphWidth,
-                height: graphHeight,
-                border: "1px solid #ccc", // 可选：为了可视化 Graph 区域的边界
-                flexShrink: 0,
+                width: '100%',
+                height: '100%',
             }}
         >
-            <Graph width={graphWidth} height={graphHeight} />
+            <Graph
+                {...{ width, height, learnedSkillIds, setLearnedSkillIds, recommendedJobId, setRecommendedJobId }}
+            />
         </Box>
     );
 }

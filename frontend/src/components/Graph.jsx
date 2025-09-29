@@ -2,14 +2,17 @@ import ForceGraph2D from "react-force-graph-2d";
 import initialGraphData from "../data/GraphData";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { forceCollide } from "https://esm.sh/d3-force-3d";
-
-function Graph({ width, height }) {
+function Graph({
+  width,
+  height,
+  learnedSkillIds,
+  setLearnedSkillIds,
+  recommendedJobId,
+  setRecommendedJobId,
+}) {
   const fgRef = useRef();
 
-  // 1. 状态更新：替换为 Learned Skills 和 Recommended Job
-  const [learnedSkillIds, setLearnedSkillIds] = useState(new Set());
-  // Job 最多选中一个，用字符串存储 ID
-  const [recommendedJobId, setRecommendedJobId] = useState(null);
+  // 状态已从 App.jsx 提升并作为 props 传入
 
   // 2. 使用 useMemo 确保映射关系和数据稳定
   const { nodeNameIDToGraphID, nodeGraphIDToOrigNode, predecessorsMap } = useMemo(() => {
@@ -102,7 +105,7 @@ function Graph({ width, height }) {
     // 3. 居中视图 (可选)
     // fgRef.current.centerAt(node.x, node.y, 300);
 
-  }, [fgRef, nodeNameIDToGraphID, nodeGraphIDToOrigNode, recommendedJobId]); // 依赖 recommendedJobId
+  }, [fgRef, nodeNameIDToGraphID, nodeGraphIDToOrigNode, recommendedJobId, setRecommendedJobId, setLearnedSkillIds]); // 依赖项更新
 
   // --- 辅助函数：判断 Skill 是否被推荐 ---
   const isSkillRecommended = useCallback((skillId) => {

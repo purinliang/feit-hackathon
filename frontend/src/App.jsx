@@ -1,11 +1,20 @@
 // src/App.jsx
 // src/App.jsx
 import "./App.css";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { Box, Button, Stepper, Step, StepLabel, Typography } from "@mui/material"; // 导入 MUI 的 Box, Button, Stepper, Step, StepLabel, Typography 组件
+import { Box, Stepper, Step, StepLabel, Typography, IconButton, createTheme, ThemeProvider, CssBaseline } from "@mui/material";
+import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import GraphPage from './pages/GraphPage'; // 导入 GraphPage 组件
 import ResultPage from './pages/ResultPage'; // 导入 ResultPage 组件
+import initialGraphData from './data/GraphData'; // 导入图表数据以获取节点信息
+
+// 创建深色主题
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 // 定义一个主应用组件，包含路由和整体布局
 function MainApp() {
@@ -13,6 +22,13 @@ function MainApp() {
   const location = useLocation();
   const steps = ['Introduction', 'Graph Interaction', 'Results'];
   const [activeStep, setActiveStep] = useState(0); // 0-indexed for array
+
+  // 状态提升：将 Graph 的状态提升到 App 组件
+  const [learnedSkillIds, setLearnedSkillIds] = useState(new Set());
+  const [recommendedJobId, setRecommendedJobId] = useState(null);
+
+  // 预处理节点数据，方便在 ResultPage 中查找节点名称
+  const nodeMap = useMemo(() => new Map(initialGraphData.nodes.map(node => [node.id, node])), []);
 
   // 根据当前路由更新 activeStep
   useEffect(() => {
@@ -24,6 +40,10 @@ function MainApp() {
       setActiveStep(0); // 默认或 'Introduction'
     }
   }, [location.pathname]);
+
+  const handleBack = () => {
+    navigate(-1); // react-router-dom v6 的后退功能
+  };
 
   const handleNextPage = () => {
     if (activeStep === 0) {
@@ -37,39 +57,72 @@ function MainApp() {
     }
   };
 
+  const isFirstStep = activeStep === 0;
+  const isLastStep = activeStep === steps.length - 1;
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', bgcolor: 'background.default', color: 'text.primary' }}>
       {/* 顶部进度条和Next Page按钮 */}
       <Box
         sx={{
           width: '100%',
           p: 2,
-          borderBottom: '1px solid #eee',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          boxShadow: '0px 2px 4px rgba(0,0,0,0.1)', // 添加一些阴影增加层次感
+          justifyContent: 'center',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
         }}
       >
-        <Stepper activeStep={activeStep} alternativeLabel sx={{ flexGrow: 1, mr: 2 }}>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-        <Button variant="contained" onClick={handleNextPage} disabled={activeStep === steps.length - 1}>
-          {activeStep === steps.length - 1 ? 'Finish' : 'Next Page'}
-        </Button>
+        <IconButton onClick={handleBack} disabled={isFirstStep} color="inherit">
+          <ArrowBackIosNew />
+        </IconButton>
+        <Box sx={{ width: '100%', maxWidth: '800px', mx: 2 }}>
+          <Stepper activeStep={activeStep} alternativeLabel>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </Box>
+        <IconButton onClick={handleNextPage} disabled={isLastStep} color="inherit">
+          <ArrowForwardIos />
+        </IconButton>
       </Box>
 
       {/* 页面内容区域 */}
-      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', p: 2 }}>
-        <Routes>
-          <Route path="/" element={<Typography variant="h4">Welcome! Click 'Next Page' to start.</Typography>} />
-          <Route path="/graph" element={<GraphPage graphWidth={1366} graphHeight={768} />} />
-          <Route path="/results" element={<ResultPage />} />
-        </Routes>
+      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Box
+          sx={{
+            width: 800,
+            height: 480,
+            bgcolor: 'grey.900', // 给内容区一个稍亮的背景以区分
+            borderRadius: 2,
+            boxShadow: 6,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'hidden', // 确保内容不会溢出
+          }}
+        >
+          <Routes>
+            <Route path="/" element={<Typography variant="h4">Welcome! Click the arrow to start.</Typography>} />
+            <Route
+              path="/graph"
+              element={
+                <GraphPage
+                  width={800}
+                  height={480}
+                  learnedSkillIds={learnedSkillIds}
+                  setLearnedSkillIds={setLearnedSkillIds}
+                  recommendedJobId={recommendedJobId}
+                  setRecommendedJobId={setRecommendedJobId}
+                />
+              }
+            />
+            <Route path="/results" element={<ResultPage learnedSkillIds={learnedSkillIds} recommendedJobId={recommendedJobId} nodeMap={nodeMap} />} />
+          </Routes>
+        </Box>
       </Box>
     </Box>
   );
@@ -77,9 +130,12 @@ function MainApp() {
 
 function App() {
   return (
-    <Router>
-      <MainApp />
-    </Router>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline /> {/* 重置 CSS 并应用背景色 */}
+      <Router>
+        <MainApp />
+      </Router>
+    </ThemeProvider>
   );
 }
 
