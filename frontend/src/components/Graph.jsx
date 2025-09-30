@@ -57,7 +57,7 @@ function Graph({
       jobDefault: "hsla(255, 92%, 70%, 1.00)", // 柔淡紫 (violet-400)
       learned: "#ffe08a",         // 清冷薄荷绿 (Tailwind emerald-400)   点的光环
       recommendedJob: "#fbbf24",  // 柔和琥珀橙 (Tailwind amber-400)     发光的有向边
-      priorityRecommended: "#f472b6", // 亮粉色 (Tailwind pink-400)，用于优先推荐
+      priorityRecommended: "#fbbf24", // 亮粉色 (Tailwind pink-400)，用于优先推荐
       skillHighlight: "hsla(198, 71%, 70%, 1.00)", // 技能高亮
       skillHover: "hsla(198, 71%, 85%, 1.00)",     // 技能悬停
       jobHighlight: "hsla(255, 92%, 70%, 1.00)",   // 职位高亮
@@ -87,9 +87,9 @@ function Graph({
     nodeRelSize: 4,      // 全局节点基础半径（ForceGraph2D）
     nodeRadius: 3.5,     // 你自绘时的基准半径
     ringWidth: 1,        // 环线宽
-    learnedScale: 1.35,  // learned 环的放大系数
-    priorityRecommendedScale: 1.6, // 优先推荐技能的环放大系数
-    recommendedScale: 1.35, // recommended job 环放大系数
+    learnedScale: 1.32,  // learned 环的放大系数
+    priorityRecommendedScale: 1.45, // 优先推荐技能的环放大系数
+    recommendedScale: 1.32, // recommended job 环放大系数
     highlightScale: 1.15,   // ✅ 高亮“实心”的放大系数（比默认略大一点）
     fontSize: 10,
     labelYOffset: 5,
