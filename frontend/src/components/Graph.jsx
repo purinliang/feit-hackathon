@@ -456,6 +456,38 @@ function Graph({
     ctx.fillText(label, node.x, node.y - GRAPH_STYLE.labelYOffset);
   };
 
+  // 添加一个 useEffect 来设置默认的演示场景
+  useEffect(() => {
+    // 仅当没有从上一页传来推荐岗位和已学技能时，才应用此预设
+    if (!recommendedJobId && learnedSkillIds.size === 0) {
+      try {
+        const mlJobId = "job_ml_engineer";
+        setRecommendedJobId(mlJobId);
+
+        // 筛选出与 ML 岗位不直接相关的技能，用于随机选择
+        const mlPredecessors = new Set(predecessorsMap.get(mlJobId) || []);
+        const candidateSkills = initialGraphData.nodes.filter(
+          (node) => node.type === "skill"
+        );
+
+        // 随机选择 8 个技能作为已学习
+        const randomLearnedSkills = new Set();
+        if (candidateSkills.length > 8) {
+          // 打乱数组并取前8个
+          const shuffled = [...candidateSkills].sort(() => 0.5 - Math.random());
+          shuffled.slice(0, 8).forEach(skill => randomLearnedSkills.add(skill.id));
+        }
+
+        setLearnedSkillIds(randomLearnedSkills);
+
+      } catch (error) {
+        console.error("Failed to set default preset:", error);
+        // 如果预设失败，则回退到空状态，不影响正常使用
+        setRecommendedJobId(null);
+        setLearnedSkillIds(new Set());
+      }
+    }
+  }, []); // 空依赖数组确保此 effect 仅在组件挂载时运行一次
 
 
   useEffect(() => {

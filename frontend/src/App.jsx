@@ -157,7 +157,7 @@ function MainApp() {
               ? { width: "100%", height: "100%" }
               : {
                 width: 1366,
-                height: 768,
+                height: 600,
                 bgcolor: "grey.900", // 给内容区一个稍亮的背景以区分
                 borderRadius: 2,
                 boxShadow: 6,
@@ -192,7 +192,7 @@ function MainApp() {
               element={
                 <GraphPage
                   width={1366}
-                  height={768}
+                  height={600}
                   learnedSkillIds={learnedSkillIds}
                   setLearnedSkillIds={setLearnedSkillIds}
                   recommendedJobId={recommendedJobId}
