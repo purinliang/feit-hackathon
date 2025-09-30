@@ -20,45 +20,48 @@ function Graph({
   const fgRef = useRef();
 
   // 🎨 统一颜色配置
-/**
-
-  const COLORS = {
-    background: "#1f2937", // 背景色 (Tailwind gray-800)
-
-    node: {
-      skillDefault: "#EE5555", // 默认 skill 节点
-      jobDefault: "#4444FF",   // 默认 job 节点
-      learned: "green",        // 已学习技能
-      recommendedJob: "blue",  // 推荐岗位
-      highlight: "orange",     // 高亮状态
-      hover: "red",            // 悬停状态
-    },
-
-    text: {
-      default: "grey",
-      highlight: "white",
-    },
-
-    link: {
-      default: (necessity) =>
-        `rgba(${Math.round(255 * necessity) / 1.1}, ${Math.round(
-          255 * necessity
-        )}, ${Math.round(255 * necessity) / 1.1}, 0.3)`,
-      recommended: "orange",
-    },
-  };
-
-*/
+  /**
+  
+    const COLORS = {
+      background: "#1f2937", // 背景色 (Tailwind gray-800)
+  
+      node: {
+        skillDefault: "#EE5555", // 默认 skill 节点
+        jobDefault: "#4444FF",   // 默认 job 节点
+        learned: "green",        // 已学习技能
+        recommendedJob: "blue",  // 推荐岗位
+        highlight: "orange",     // 高亮状态
+        hover: "red",            // 悬停状态
+      },
+  
+      text: {
+        default: "grey",
+        highlight: "white",
+      },
+  
+      link: {
+        default: (necessity) =>
+          `rgba(${Math.round(255 * necessity) / 1.1}, ${Math.round(
+            255 * necessity
+          )}, ${Math.round(255 * necessity) / 1.1}, 0.3)`,
+        recommended: "orange",
+      },
+    };
+  
+  */
   const COLORS = {
     background: "#000000", // 🖤 纯黑背景（极简冷感）
 
     node: {
-      skillDefault: "#38bdf8", // 明亮天蓝 (sky-400)
-      jobDefault:   "#a78bfa", // 柔淡紫 (violet-400)
-      learned: "#ffe08a",         // 清冷薄荷绿 (Tailwind emerald-400)
-      recommendedJob: "#fbbf24",  // 柔和琥珀橙 (Tailwind amber-400)
-      highlight: "#f472b6",       // 柔粉紫，用于 hover 高亮
-      hover: "#f87171",           // 低饱和珊瑚红 (Tailwind red-400)
+      skillDefault: "hsla(198, 71%, 40%, 1.00)", // 明亮天蓝 (sky-400)
+      jobDefault: "hsla(255, 92%, 70%, 1.00)", // 柔淡紫 (violet-400)
+      learned: "#ffe08a",         // 清冷薄荷绿 (Tailwind emerald-400)   点的光环
+      recommendedJob: "#fbbf24",  // 柔和琥珀橙 (Tailwind amber-400)     发光的有向边
+      skillHighlight: "hsla(198, 71%, 70%, 1.00)", // 技能高亮
+      skillHover: "hsla(198, 71%, 85%, 1.00)",     // 技能悬停
+      jobHighlight: "hsla(255, 92%, 70%, 1.00)",   // 职位高亮
+      jobHover: "hsla(255, 92%, 85%, 1.00)",       // 职位悬停
+      ringHover: "#f87171",           // 低饱和珊瑚红 (Tailwind red-400)
     },
 
     text: {
@@ -351,6 +354,7 @@ function Graph({
 
   const paintNode = (node, ctx, globalScale) => {
     let textColor = COLORS.text.default;
+    const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
     if (highlightNodes.has(node)) textColor = COLORS.text.highlight;
 
     // 画“环”
@@ -364,32 +368,48 @@ function Graph({
 
     if (learnedNodes.has(node)) {
       // ✅ learned：仍然用环
-      ring(node === hoverNode ? COLORS.node.hover : COLORS.node.learned,
-          GRAPH_STYLE.learnedScale);
+      ring(node === hoverNode ? COLORS.node.ringHover : COLORS.node.learned,
+        GRAPH_STYLE.learnedScale);
+      ctx.beginPath();
+      ctx.arc(
+        node.x,
+        node.y,
+        NODE_R * GRAPH_STYLE.highlightScale, // 比默认圆略大一点
+        0,
+        2 * Math.PI
+      );
+      const isJob = origNode.type === 'job';
+      const highlightColor = isJob ? COLORS.node.jobHighlight : COLORS.node.skillHighlight;
+      const hoverColor = isJob ? COLORS.node.jobHover : COLORS.node.skillHover;
+
+      ctx.fillStyle = node === hoverNode ? hoverColor : highlightColor;
+      ctx.fill();
     } else {
-      const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
       if (recommendedNodes.has(node) && origNode.type === "job") {
         // ✅ recommended job：仍然用环
-        ring(node === hoverNode ? COLORS.node.hover : COLORS.node.recommendedJob,
-            GRAPH_STYLE.recommendedScale);
+        ring(node === hoverNode ? COLORS.node.ringHover : COLORS.node.recommendedJob,
+          GRAPH_STYLE.recommendedScale);
       } else if (highlightNodes.has(node)) {
         // ✅ highlight：改成“实心 + 更小半径”
         ctx.beginPath();
         ctx.arc(
           node.x,
           node.y,
-          NODE_R * GRAPH_STYLE.highlightScale, // 比默认圆略小一点
+          NODE_R * GRAPH_STYLE.highlightScale, // 比默认圆略大一点
           0,
           2 * Math.PI
         );
-        ctx.fillStyle =
-          node === hoverNode ? COLORS.node.hover : COLORS.node.highlight;
+        const isJob = origNode.type === 'job';
+        const highlightColor = isJob ? COLORS.node.jobHighlight : COLORS.node.skillHighlight;
+        const hoverColor = isJob ? COLORS.node.jobHover : COLORS.node.skillHover;
+
+        ctx.fillStyle = node === hoverNode ? hoverColor : highlightColor;
         ctx.fill();
       }
     }
 
     // 文本
-    const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
+    // const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
     const label = getNodeLabel(origNode);
     const fontSize = GRAPH_STYLE.fontSize / globalScale;
     ctx.font = `${fontSize}px Inter, sans-serif`;
@@ -428,13 +448,13 @@ function Graph({
         // 调整背景色和文字颜色
         // =========================================================
         //backgroundColor="#1f2937" // 深灰色背景 (Tailwind gray-800)
-        backgroundColor={COLORS.background} 
+        backgroundColor={COLORS.background}
         // =========================================================
         //nodeCanvasObjectMode={(node) => "before"}
         nodeCanvasObjectMode={(node) => "after"}
         nodeCanvasObject={paintNode}
         nodeRelSize={GRAPH_STYLE.nodeRelSize}
-        
+
         onNodeClick={handleClick}
         linkWidth={getLinkWidth}
         linkLineDash={getLinkDash}
@@ -458,11 +478,11 @@ function Graph({
         //linkStrength={(link) => {return Math.min(1, Math.max(0.3, link.necessity));}}
         //linkDistance={100} // default link length
         */
-        
+
         linkStrength={(l) => Math.max(0.2, l.necessity * 0.8)}
-        
+
         linkDistance={(l) => 120 + (1 - l.necessity) * 140}
-          d3Force={(name, force) => {
+        d3Force={(name, force) => {
           if (name === "charge") {
             force.strength(-1800).distanceMax(350);
           }
