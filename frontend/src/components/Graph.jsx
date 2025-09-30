@@ -55,7 +55,7 @@ function Graph({
     node: {
       skillDefault: "#38bdf8", // 明亮天蓝 (sky-400)
       jobDefault:   "#a78bfa", // 柔淡紫 (violet-400)
-      learned: "#34d399",         // 清冷薄荷绿 (Tailwind emerald-400)
+      learned: "#ffe08a",         // 清冷薄荷绿 (Tailwind emerald-400)
       recommendedJob: "#fbbf24",  // 柔和琥珀橙 (Tailwind amber-400)
       highlight: "#f472b6",       // 柔粉紫，用于 hover 高亮
       hover: "#f87171",           // 低饱和珊瑚红 (Tailwind red-400)
