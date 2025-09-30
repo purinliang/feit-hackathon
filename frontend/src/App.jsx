@@ -156,8 +156,8 @@ function MainApp() {
             isFirstStep
               ? { width: "100%", height: "100%" }
               : {
-                width: 1280,
-                height: 720,
+                width: 1366,
+                height: 768,
                 bgcolor: "grey.900", // 给内容区一个稍亮的背景以区分
                 borderRadius: 2,
                 boxShadow: 6,
@@ -191,8 +191,8 @@ function MainApp() {
               path="/graph"
               element={
                 <GraphPage
-                  width={1280}
-                  height={720}
+                  width={1366}
+                  height={768}
                   learnedSkillIds={learnedSkillIds}
                   setLearnedSkillIds={setLearnedSkillIds}
                   recommendedJobId={recommendedJobId}
