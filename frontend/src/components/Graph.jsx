@@ -53,7 +53,7 @@ function Graph({
     background: "#000000", // 🖤 纯黑背景（极简冷感）
 
     node: {
-      skillDefault: "hsla(198, 71%, 40%, 1.00)", // 明亮天蓝 (sky-400)
+      skillDefault: "hsla(198, 71%, 40%, 0.40)", // 明亮天蓝 (sky-400)
       jobDefault: "hsla(255, 92%, 70%, 1.00)", // 柔淡紫 (violet-400)
       learned: "#ffe08a",         // 清冷薄荷绿 (Tailwind emerald-400)   点的光环
       recommendedJob: "#fbbf24",  // 柔和琥珀橙 (Tailwind amber-400)     发光的有向边
@@ -77,7 +77,7 @@ function Graph({
           Math.pow(necessity, GRAPH_STYLE.linkAlpha.gamma);
         return `rgba(${96 + necessity * 30}, ${165 + necessity * 20}, 250, ${a})`;
       },
-      recommended: "#fbbf24",
+      recommended: "hsla(43, 95%, 60%, 0.60)",
     },
   };
 
@@ -91,7 +91,7 @@ function Graph({
     highlightScale: 1.15,   // ✅ 高亮“实心”的放大系数（比默认略大一点）
     fontSize: 10,
     labelYOffset: 5,
-    linkAlpha: { min: 0.06, max: 0.8, gamma: 1.4 } // α范围更大 + 非线性
+    linkAlpha: { min: 0.06, max: 0.8, gamma: 5 } // α范围更大 + 非线性
   };
 
 
@@ -213,13 +213,11 @@ function Graph({
     forceGraphData.links.forEach((link) => {
       const u = link.source;
       const v = link.target;
-      const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[v.id]];
+      // 新逻辑：如果一条边的起点和终点都在推荐节点集合中，
+      // 那么这条边就是推荐路径的一部分。
       if (
-        learnedSkillIds.has(u.id) &&
-        (origNode.type === "skill"
-          ? isSkillRecommended(v.id)
-          : recommendedJobId === v.id) &&
-        !learnedSkillIds.has(v.id)
+        recommendedNodes.has(nodeIDtoNode[u.id]) &&
+        recommendedNodes.has(nodeIDtoNode[v.id])
       ) {
         recommendedLinks.add(link);
       }

@@ -156,16 +156,16 @@ function MainApp() {
             isFirstStep
               ? { width: "100%", height: "100%" }
               : {
-                  width: 800,
-                  height: 600,
-                  bgcolor: "grey.900", // 给内容区一个稍亮的背景以区分
-                  borderRadius: 2,
-                  boxShadow: 6,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  overflow: "hidden", // 确保内容不会溢出
-                }
+                width: 1280,
+                height: 720,
+                bgcolor: "grey.900", // 给内容区一个稍亮的背景以区分
+                borderRadius: 2,
+                boxShadow: 6,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden", // 确保内容不会溢出
+              }
           }
         >
           <Routes>
@@ -191,8 +191,8 @@ function MainApp() {
               path="/graph"
               element={
                 <GraphPage
-                  width={800}
-                  height={600}
+                  width={1280}
+                  height={720}
                   learnedSkillIds={learnedSkillIds}
                   setLearnedSkillIds={setLearnedSkillIds}
                   recommendedJobId={recommendedJobId}
