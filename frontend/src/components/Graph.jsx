@@ -57,6 +57,7 @@ function Graph({
       jobDefault: "hsla(255, 92%, 70%, 1.00)", // 柔淡紫 (violet-400)
       learned: "#ffe08a",         // 清冷薄荷绿 (Tailwind emerald-400)   点的光环
       recommendedJob: "#fbbf24",  // 柔和琥珀橙 (Tailwind amber-400)     发光的有向边
+      priorityRecommended: "#f472b6", // 亮粉色 (Tailwind pink-400)，用于优先推荐
       skillHighlight: "hsla(198, 71%, 70%, 1.00)", // 技能高亮
       skillHover: "hsla(198, 71%, 85%, 1.00)",     // 技能悬停
       jobHighlight: "hsla(255, 92%, 70%, 1.00)",   // 职位高亮
@@ -87,6 +88,7 @@ function Graph({
     nodeRadius: 3.5,     // 你自绘时的基准半径
     ringWidth: 1,        // 环线宽
     learnedScale: 1.35,  // learned 环的放大系数
+    priorityRecommendedScale: 1.6, // 优先推荐技能的环放大系数
     recommendedScale: 1.35, // recommended job 环放大系数
     highlightScale: 1.15,   // ✅ 高亮“实心”的放大系数（比默认略大一点）
     fontSize: 10,
@@ -99,7 +101,7 @@ function Graph({
 
 
   // 1. 使用 useMemo 确保映射关系和数据稳定
-  const { nodeNameIDToGraphID, nodeGraphIDToOrigNode, predecessorsMap } =
+  const { nodeNameIDToGraphID, nodeGraphIDToOrigNode, predecessorsMap, jobSkillNecessity } =
     useMemo(() => {
       let nameIDToGraphID = {};
       let graphIDToOrigNode = {};
@@ -114,17 +116,24 @@ function Graph({
         }
       });
 
+      const jobSkillNecessity = new Map();
       (initialGraphData.edges ?? []).forEach((edge) => {
         // job 节点的 predecessors 是指向它的 source 节点
         if (jobPredecessorsMap.has(edge.target)) {
-          jobPredecessorsMap.get(edge.target).push(edge.source);
+          const skillId = edge.source;
+          const jobId = edge.target;
+          jobPredecessorsMap.get(jobId).push(skillId);
+          if (!jobSkillNecessity.has(jobId)) {
+            jobSkillNecessity.set(jobId, new Map());
+          }
+          jobSkillNecessity.get(jobId).set(skillId, edge.necessity);
         }
       });
 
       return {
         nodeNameIDToGraphID: nameIDToGraphID,
         nodeGraphIDToOrigNode: graphIDToOrigNode,
-        predecessorsMap: jobPredecessorsMap,
+        predecessorsMap: jobPredecessorsMap, jobSkillNecessity
       };
     }, []);
 
@@ -175,6 +184,7 @@ function Graph({
   const [learnedNodes, setLearnedNodes] = useState(new Set());
   const [recommendedNodes, setRecommendedNodes] = useState(new Set());
   const [recommendedLinks, setRecommendedLinks] = useState(new Set());
+  const [priorityRecommendedNodes, setPriorityRecommendedNodes] = useState(new Set());
   const [highlightNodes, setHighlightNodes] = useState(new Set());
   const [highlightLinks, setHighlightLinks] = useState(new Set());
   const [hoverNode, setHoverNode] = useState(null);
@@ -193,6 +203,7 @@ function Graph({
     learnedNodes.clear();
     recommendedNodes.clear();
     recommendedLinks.clear();
+    priorityRecommendedNodes.clear();
     let nodeIDtoNode = {};
     forceGraphData.nodes.forEach((node) => {
       nodeIDtoNode[node.id] = node;
@@ -210,6 +221,26 @@ function Graph({
         }
       }
     });
+
+    // 筛选出优先推荐的技能
+    if (recommendedJobId && recommendedNodes.size > 0) {
+      const jobNecessityMap = jobSkillNecessity.get(recommendedJobId) || new Map();
+      const unlearnedRecommendedSkills = [...recommendedNodes]
+        .filter(node => {
+          const origNode = nodeGraphIDToOrigNode[nodeNameIDToGraphID[node.id]];
+          return origNode.type === 'skill' && !learnedNodes.has(node);
+        });
+
+      // 按与工作的关联度排序
+      unlearnedRecommendedSkills.sort((a, b) => {
+        const necessityA = jobNecessityMap.get(a.id) || 0;
+        const necessityB = jobNecessityMap.get(b.id) || 0;
+        return necessityB - necessityA;
+      });
+
+      // 选取前3个
+      unlearnedRecommendedSkills.slice(0, 3).forEach(node => priorityRecommendedNodes.add(node));
+    }
     forceGraphData.links.forEach((link) => {
       const u = link.source;
       const v = link.target;
@@ -226,6 +257,7 @@ function Graph({
     setLearnedNodes(learnedNodes);
     setRecommendedNodes(recommendedNodes);
     setRecommendedLinks(recommendedLinks);
+    setPriorityRecommendedNodes(priorityRecommendedNodes);
   };
 
   // 3. **核心逻辑：点击事件处理**
@@ -383,6 +415,11 @@ function Graph({
       ctx.fillStyle = node === hoverNode ? hoverColor : highlightColor;
       ctx.fill();
     } else {
+      if (priorityRecommendedNodes.has(node)) {
+        // ✅ priority recommended skill: 增加一个金色的大光环
+        ring(node === hoverNode ? COLORS.node.ringHover : COLORS.node.priorityRecommended,
+          GRAPH_STYLE.priorityRecommendedScale);
+      }
       if (recommendedNodes.has(node) && origNode.type === "job") {
         // ✅ recommended job：仍然用环
         ring(node === hoverNode ? COLORS.node.ringHover : COLORS.node.recommendedJob,
@@ -398,7 +435,9 @@ function Graph({
           2 * Math.PI
         );
         const isJob = origNode.type === 'job';
-        const highlightColor = isJob ? COLORS.node.jobHighlight : COLORS.node.skillHighlight;
+        let highlightColor = isJob ? COLORS.node.jobHighlight : COLORS.node.skillHighlight;
+        // 如果是优先推荐节点，使用专属颜色
+        if (priorityRecommendedNodes.has(node)) highlightColor = COLORS.node.priorityRecommended;
         const hoverColor = isJob ? COLORS.node.jobHover : COLORS.node.skillHover;
 
         ctx.fillStyle = node === hoverNode ? hoverColor : highlightColor;
