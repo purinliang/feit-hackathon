@@ -44,22 +44,28 @@ function MainApp() {
   const [recommendedJobId, setRecommendedJobId] = useState(null);
 
   // 预处理节点数据，方便在 ResultPage 中查找节点名称
-  const { nodeMap, predecessorsMap } = useMemo(() => {
+  const { nodeMap, predecessorsMap, jobSkillNecessity } = useMemo(() => {
     const map = new Map(initialGraphData.nodes.map((node) => [node.id, node]));
     const jobPredecessorsMap = new Map();
+    const jobSkillNecessityMap = new Map();
 
     initialGraphData.nodes.forEach((node) => {
       if (node.type === "job") {
         jobPredecessorsMap.set(node.id, []);
+        jobSkillNecessityMap.set(node.id, new Map());
       }
     });
 
     (initialGraphData.edges ?? []).forEach((edge) => {
       if (jobPredecessorsMap.has(edge.target)) {
-        jobPredecessorsMap.get(edge.target).push(edge.source);
+        const skillId = edge.source;
+        const jobId = edge.target;
+        jobPredecessorsMap.get(jobId).push(skillId);
+        jobSkillNecessityMap.get(jobId).set(skillId, edge.necessity);
       }
     });
-    return { nodeMap: map, predecessorsMap: jobPredecessorsMap };
+
+    return { nodeMap: map, predecessorsMap: jobPredecessorsMap, jobSkillNecessity: jobSkillNecessityMap };
   }, []);
 
   // 根据当前路由更新 activeStep
@@ -208,6 +214,7 @@ function MainApp() {
                   recommendedJobId={recommendedJobId}
                   nodeMap={nodeMap}
                   predecessorsMap={predecessorsMap}
+                  jobSkillNecessity={jobSkillNecessity}
                 />
               }
             />
